@@ -43,6 +43,7 @@ var loadTasks = function() {
 var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 
+  // textarea was clicked
   $(".list-group").on("click", "p", function() {
     var text = $(this)
       .text()
@@ -57,6 +58,7 @@ var saveTasks = function() {
     textInput.trigger("focus");
   });
 
+  // textarea area value was changed
   $(".list-group").on("blur", "textarea", function () {
     // get the textarea's current value/text
     var text = $(this)
@@ -74,6 +76,10 @@ var saveTasks = function() {
       .closest(".list-group-item")
       .index();
 
+    // update task in array and re-save to localstorage
+    tasks[status][index].text = text;
+    saveTasks();
+
     // recreate p element
     var taskP = $("<p>")
       .addClass("m-1")
@@ -81,6 +87,57 @@ var saveTasks = function() {
 
     // replace textarea with p element
     $(this).replaceWith(taskP);
+  });
+
+  // due date was clicked
+  $(".list-group").on("click", "span", function() {
+    // get current text
+    var date = $(this)
+      .text()
+      .trim();
+
+    // create new input element
+    var dateInput = $("<input>")
+      .attr("type", "text")
+      .addClass("form-control")
+      .val(date);
+
+    // swap out elements
+    $(this).replaceWith(dateInput);
+
+    // automatically focus on the element
+    dateInput.trigger("focus");
+  });
+
+  // value of due date was changed
+  $(".list-group").on("blur", "input[type='text']", function() {
+    // get current text
+    var date = $(this)
+      .val()
+      .trim();
+
+    // get the parent ul's id attribute
+    var status = $(this)
+      .closest(".list-group")
+      .attr("id")
+      .replace("list-", "");
+
+    // get the task's position in the list of other li elements
+    var index = $(this)
+      .closest(".list-group-item")
+      .index();
+
+    // update task in array and re-save to localstorage
+    tasks[status][index].date = date;
+    saveTasks();
+
+    // recreate span element with bootstrap classes
+    var taskSpan = $("<span>")
+      .addClass("badge badge-primary badge-pill")
+      .text(date);
+
+    // replace input with span element
+    $(this).replaceWith(taskSpan);
   });
 };
 
